@@ -1,0 +1,13 @@
+name: misc
+channels:
+  - defaults
+dependencies:
+  - python
+  - pylint
+  - ipykernel
+  - pandas
+  - xlrd
+  - requests
+  - pillow
+prefix: C:\Users\.conda\envs\misc
+

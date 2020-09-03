@@ -17,7 +17,8 @@ def ExcelToPdf(excelFile, pdfOutputDir):
             if (column.find("-") != -1):
                 try:
                     urlRow = dfs[column][row]
-                    urls = [x.strip() for x in urlRow.split()]
+                    urlRow = urlRow.split()[-1::-1]
+                    urls = [x.strip() for x in urlRow]
                     for url in urls:
                         response = s.get(url, stream=True)
                         #print(response.status_code)

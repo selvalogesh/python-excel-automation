@@ -12,6 +12,7 @@ def ExcelToPdf(excelFile, pdfOutputDir):
         firstImg = None
         name = dfs["Student Name"][row]
         roll = dfs["Roll No./Register No"][row]
+        pdfFlag = False
 
         for column in dfs:
             if (column.find("-") != -1):
@@ -22,17 +23,26 @@ def ExcelToPdf(excelFile, pdfOutputDir):
                     for url in urls:
                         response = s.get(url, stream=True)
                         #print(response.status_code)
-                        if(response.status_code == 200):
-                            img = Image.open(response.raw)
-                            if(img.mode == 'RGBA'):
-                                img = img.convert('RGB')
-                            if(firstImg == None):
-                                firstImg = img
-                            else:
-                                imagelist.append(img)
+                        if( ".pdf" in url):
+                            pdfFlag = True
+                            if(response.status_code == 200):
+                                pdfFilePath = os.path.join(pdfOutputDir,"{0}_{1}_{2}_{3}.pdf".format(row, roll, name, column)).replace("\\","/")
+                                with open(pdfFilePath, 'wb') as fd:
+                                    for chunk in response.iter_content(2000):
+                                        fd.write(chunk)
+                                print("Done {0}_{1}_{2}_{3}.pdf".format(row, roll, name, column))
                         else:
-                            NoneImg = Image.open("None.jpg")
-                            imagelist.append(NoneImg)
+                            if(response.status_code == 200):
+                                img = Image.open(response.raw)
+                                if(img.mode == 'RGBA'):
+                                    img = img.convert('RGB')
+                                if(firstImg == None):
+                                    firstImg = img
+                                else:
+                                    imagelist.append(img)
+                            else:
+                                NoneImg = Image.open("None.jpg")
+                                imagelist.append(NoneImg)
                 except:
                     errorLog = os.path.join(pdfOutputDir,"error.txt").replace("\\","/")
                     with open(errorLog,'a') as err:
@@ -40,8 +50,9 @@ def ExcelToPdf(excelFile, pdfOutputDir):
                     print("Error in {0}_{1}_{2} in {3} -> {4}".format(row, roll, name, column, dfs[column][row]))
                     NoneImg = Image.open("None.jpg")
                     imagelist.append(NoneImg)
-        if(firstImg == None):
-            firstImg = Image.open("None.jpg")
-        pdfFilePath = os.path.join(pdfOutputDir,"{0}_{1}_{2}.pdf".format(row, roll, name)).replace("\\","/")
-        firstImg.save(pdfFilePath,save_all=True, append_images=imagelist)
-        print("Done {0}_{1}_{2}".format(row, roll, name))
+        if(not pdfFlag):
+            if(firstImg == None):
+                firstImg = Image.open("None.jpg")
+            pdfFilePath = os.path.join(pdfOutputDir,"{0}_{1}_{2}.pdf".format(row, roll, name)).replace("\\","/")
+            firstImg.save(pdfFilePath,save_all=True, append_images=imagelist)
+            print("Done {0}_{1}_{2}".format(row, roll, name))

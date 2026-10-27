@@ -4,7 +4,7 @@ import shutil
 
 input_directory = "./input"
 output_directory = "./output"
-zip_directory = "C:/Users/Selva logesh/Google Drive/Auto Sync"
+zip_directory = "G:\My Drive\Auto Sync"
 
 if __name__ == "__main__":
     if(os.path.isdir(input_directory) and os.path.isdir(output_directory) and os.path.isdir(zip_directory)):
